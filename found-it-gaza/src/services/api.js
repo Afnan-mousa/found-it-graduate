@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 // رابط الباك إند
-const API_URL = 'http://localhost:5000/api';  
+const API_URL = 'https://found-it-graduate.onrender.com';  
 
 const API = axios.create({ baseURL: API_URL });
 

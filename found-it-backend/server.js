@@ -56,7 +56,7 @@ const chatRoutes = require("./routes/chatRoutes");
 // Middlewares
 app.use(
   cors({
-    origin: CLIENT_URL,
+    origin: "*",
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true,
