@@ -54,17 +54,13 @@ const itemRoutes = require("./routes/itemRoutes");
 const chatRoutes = require("./routes/chatRoutes");
 
 // Middlewares
-app.use(
-  cors({
-  //   origin: [
-  //   "http://localhost:5173",
-  //   "https://found-it-graduate-1.onrender.com"
-  // ],
-  //   methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
-  //   allowedHeaders: ["Content-Type", "Authorization"],
-  //   credentials: true,
-  })
-);
+app.use(cors({
+  origin: [
+    "http://localhost:5173",
+    "https://found-it-graduate-1.onrender.com"
+  ],
+  credentials: true
+}));
 
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ limit: "10mb", extended: true }));
