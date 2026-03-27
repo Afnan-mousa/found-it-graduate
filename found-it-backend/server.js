@@ -56,7 +56,10 @@ const chatRoutes = require("./routes/chatRoutes");
 // Middlewares
 app.use(
   cors({
-    origin: "*",
+    origin: [
+    "http://localhost:5173",
+    "https://found-it-graduate-1.onrender.com"
+  ],
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true,
