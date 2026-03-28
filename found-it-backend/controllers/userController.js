@@ -70,6 +70,7 @@
   const loginUser = async (req, res) => {
       try {
           const { email, password } = req.body;
+          console.log("LOGIN BODY:", req.body);
 
           if (!email || !password) {
           return res.status(400).json({
@@ -78,7 +79,11 @@
           });
           }
           const normalizedEmail = email.trim().toLowerCase();
+          console.log("NORMALIZED EMAIL:", normalizedEmail);
+
           const user = await User.findOne({ email: normalizedEmail });
+          console.log("USER FOUND:", !!user);
+
           if (!user) {
           return res.status(401).json({
               success: false,
@@ -86,6 +91,9 @@
           });
           }
           const isMatch = await bcrypt.compare(password, user.password);
+          console.log("PASSWORD MATCH:", isMatch);
+          console.log("STORED PASSWORD:", user.password);
+
           if (!isMatch) {
           return res.status(401).json({
               success: false,
