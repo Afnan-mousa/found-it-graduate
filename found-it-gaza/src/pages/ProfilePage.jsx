@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { getUserPosts, deleteItem } from "../services/api";
+import API from "../services/api";
 
 function ProfilePage({ onManage, onDetails, refreshKey }) {
   const [userPosts, setUserPosts] = useState([]);
@@ -39,41 +40,26 @@ function ProfilePage({ onManage, onDetails, refreshKey }) {
     reader.readAsDataURL(file);
   };
 
-  const handleSaveProfile = async () => {
-    try {
-      const token = localStorage.getItem("userToken");
 
-      const response = await fetch("https://found-it-graduate-backend.onrender.com/api/users/profile", {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          fullName : name,
-          avatar,
-          location,
-        }),
-      });
+const handleSaveProfile = async () => {
+  try {
+    const { data } = await API.put("/users/profile", {
+      fullName: name,
+      avatar,
+      location,
+    });
 
-      const data = await response.json();
-      console.log("profile update response:", data);
+    localStorage.setItem("profile", JSON.stringify(data.user));
+    setAvatar(data.user.avatar || "");
+    setName(data.user.fullName || "مستخدم");
+    setLocation(data.user.location || "غزة، فلسطين");
 
-      if (!response.ok) {
-        throw new Error(data.message || "فشل تحديث الملف الشخصي");
-      } 
-
-      localStorage.setItem("profile", JSON.stringify(data.user));
-      setAvatar(data.user.avatar || "");
-      setName(data.user.fullName || "مستخدم");
-      setLocation(data.user.location || "غزة، فلسطين")
-      alert("تم تحديث البروفايل");
-
-    } catch (err) {
-      console.error("Profile save error:", err);
-      alert(err.message || "خطأ في الاتصال");
-    }
-  };
+    alert("تم تحديث البروفايل");
+  } catch (err) {
+    console.error("Profile save error:", err);
+    alert(err?.response?.data?.message || "خطأ في الاتصال");
+  }
+};
 
   const loadMyPosts = async () => {
     try {
