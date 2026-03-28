@@ -41,9 +41,9 @@ function ProfilePage({ onManage, onDetails, refreshKey }) {
 
   const handleSaveProfile = async () => {
     try {
-      const token = localStorage.getItem("token");
+      const token = localStorage.getItem("userToken");
 
-      const response = await fetch("http://localhost:5000/api/users/profile", {
+      const response = await fetch("https://found-it-graduate-backend.onrender.com/api/users/profile", {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
