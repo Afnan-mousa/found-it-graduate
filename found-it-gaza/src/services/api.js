@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 // رابط الباك إند
-const API_URL = 'https://found-it-graduate-backend.onrender.com';  
+const API_URL = 'https://found-it-graduate-backend.onrender.com/api';  
 
 const API = axios.create({ baseURL: API_URL });
 
