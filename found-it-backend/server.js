@@ -8,22 +8,31 @@ const mongoose = require("mongoose");
 
 const app = express();
 const server = http.createServer(app);
-
 const PORT = process.env.PORT || 5000;
 
 const allowedOrigins = [
   "http://localhost:5173",
-  process.env.CLIENT_URL,
+  "https://found-it-graduate-1.onrender.com",
 ].filter(Boolean);
 
-// Middlewares
-app.use(
-  cors({
-    origin: allowedOrigins,
-    methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
-    credentials: true,
-  })
-);
+const corsOptions = {
+  origin: function (origin, callback) {
+    // السماح للطلبات بدون origin مثل Postman أو health checks
+    if (!origin) return callback(null, true);
+
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+
+    return callback(new Error(`CORS not allowed for origin: ${origin}`));
+  },
+  methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+  credentials: true,
+};
+
+app.use(cors(corsOptions));
+app.options("*", cors(corsOptions));
 
 const io = new Server(server, {
   cors: {
@@ -69,25 +78,22 @@ const notificationRoutes = require("./routes/notificationRoutes");
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ limit: "10mb", extended: true }));
 
-// Routes
 app.use("/api/items", itemRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/chat", chatRoutes);
 app.use("/api/notifications", notificationRoutes);
 
-// Health check
 app.get("/", (req, res) => {
   res.send("السيرفر يعمل وقاعدة البيانات متصلة!");
 });
 
-// MongoDB
 mongoose
   .connect(process.env.MONGO_URI)
   .then(() => {
     console.log("✅ MongoDB connected");
 
     server.listen(PORT, () => {
-      console.log(`🚀 السيرفر شغال على الرابط: http://localhost:${PORT}`);
+      console.log(`🚀 السيرفر شغال على البورت: ${PORT}`);
     });
   })
   .catch((err) => {
