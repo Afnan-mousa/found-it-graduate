@@ -68,15 +68,6 @@
                     الرسائل
                   </button>
                 </li>
-                <li>
-                  <button
-                    onClick={onDownload}
-                    className="text-blue-400 hover:text-blue-300 transition-colors"
-                  >
-                    <i className="fas fa-download ml-1 text-xs"></i> تحميل نسخة
-                    HTML
-                  </button>
-                </li>
               </ul>
             </div>
 
