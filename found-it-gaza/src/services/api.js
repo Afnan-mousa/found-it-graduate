@@ -1,13 +1,15 @@
-import axios from 'axios';
+import axios from "axios";
 
-// رابط الباك إند
-const API_URL = 'https://found-it-graduate-backend.onrender.com/api';  
+const API_URL =
+  import.meta.env.VITE_API_URL || "http://localhost:5000/api";
 
-const API = axios.create({ baseURL: API_URL });
+const API = axios.create({
+  baseURL: API_URL,
+});
 
-// إضافة التوكن تلقائياً
-API.interceptors.request.use((req) => {
-  const token = localStorage.getItem("userToken");
+API.interceptors.request.use(
+  (req) => {
+    const token = localStorage.getItem("userToken");
 
     if (token) {
       req.headers.Authorization = `Bearer ${token}`;
@@ -15,69 +17,57 @@ API.interceptors.request.use((req) => {
 
     return req;
   },
-  (error) => Promise.reject(error));
+  (error) => Promise.reject(error)
+);
 
 // =========================
 // خدمات المستخدمين
 // =========================
-export const loginUser = (userData) => API.post('/users/login', userData);
-export const registerUser = (userData) => API.post('/users/register', userData);
+export const loginUser = (userData) => API.post("/users/login", userData);
+export const registerUser = (userData) => API.post("/users/register", userData);
+export const updateUserProfile = (profileData) =>
+  API.put("/users/profile", profileData);
 
 // =========================
 // خدمات الإعلانات
 // =========================
-
-// جلب جميع الإعلانات مع فلاتر اختيارية 
 export const fetchItems = (params = {}) => API.get("/items", { params });
-
-// جلب إعلان واحد
 export const fetchItemById = (id) => API.get(`/items/${id}`);
-
-// إنشاء إعلان جديد
-export const createItem = (newItem) => API.post('/items', newItem);
-
-// alias حتى يبقى التوافق موجودًا مع AddPostPage أو أي ملف قديم
+export const createItem = (newItem) => API.post("/items", newItem);
 export const createPost = (postData) => API.post("/items", postData);
-
-// جلب منشورات المستخدم الحالي
-export const fetchMyItems = () => API.get('/items/my-posts');
-
-// اسم بديل أوضح لو أردت استخدامه لاحقًا
+export const fetchMyItems = () => API.get("/items/my-posts");
 export const getUserPosts = () => API.get("/items/my-posts");
-
-// تحديث إعلان
 export const updateItem = (id, updatedItem) => API.put(`/items/${id}`, updatedItem);
-
-// حذف إعلان
 export const deleteItem = (id) => API.delete(`/items/${id}`);
-
-// تحديث حالة الإعلان إلى "تم التسليم"
 export const markItemAsReturned = (id) => API.patch(`/items/${id}/return`);
 
+// =========================
+// خدمات المحادثات
+// =========================
 export const startConversation = (otherUserId) =>
   API.post("/chat/start", { otherUserId });
 
-export const fetchConversations = () => API.get("/chat");
-
+export const fetchMyConversations = () => API.get("/chat");
 export const fetchMessages = (conversationId) =>
   API.get(`/chat/${conversationId}/messages`);
 
 export const sendMessage = (conversationId, text) =>
   API.post(`/chat/${conversationId}/messages`, { text });
 
-export const markConversationAsRead = (conversationId) =>
+export const markMessagesAsRead = (conversationId) =>
   API.put(`/chat/${conversationId}/read`);
 
 export const fetchUnreadCount = () => API.get("/chat/unread-count");
 export const fetchChatNotifications = () => API.get("/chat/notifications");
 
-export const getMyNotifications = () =>
-  API.get("/notifications");
-
-export const getUnreadNotificationsCount = () =>
+// =========================
+// خدمات الإشعارات
+// =========================
+export const fetchNotifications = () => API.get("/notifications");
+export const fetchUnreadNotificationsCount = () =>
   API.get("/notifications/unread-count");
 
-export const markNotificationAsRead = (id) =>
-  API.patch(`/notifications/${id}/read`);
+export const markNotificationAsRead = (notificationId) =>
+  API.patch(`/notifications/${notificationId}/read`);
 
 export default API;

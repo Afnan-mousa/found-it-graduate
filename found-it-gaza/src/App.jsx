@@ -54,50 +54,54 @@ function App() {
   const [notificationCount, setNotificationCount] = useState(0);
   // --- التأثيرات (Effects) ---
 
-  useEffect(() => {
-    if (!isAuthenticated) return;
+const SOCKET_URL =
+  import.meta.env.VITE_SOCKET_URL || "http://localhost:5000";
 
-    const token = localStorage.getItem("token");
-    if (!token) return;
+useEffect(() => {
+  if (!isAuthenticated) return;
 
-    socketRef.current = io("http://localhost:5000", {
-      auth: { token },
+  const token = localStorage.getItem("userToken");
+  if (!token) return;
+
+  socketRef.current = io(SOCKET_URL, {
+    auth: { token },
+    transports: ["websocket", "polling"],
+  });
+
+  socketRef.current.on("connect", () => {
+    console.log("Socket connected");
+  });
+
+  socketRef.current.on("notification:new", (payload) => {
+    setNotifications((prev) => [payload, ...prev]);
+    setNotificationCount((prev) => prev + 1);
+  });
+
+  socketRef.current.on("new_message", (payload) => {
+    setUnreadCount((prev) => prev + 1);
+
+    setChatNotifications((prev) => {
+      const filtered = prev.filter(
+        (n) => n.conversationId !== payload.conversationId
+      );
+
+      return [
+        {
+          conversationId: payload.conversationId,
+          senderName: payload.sender.fullName,
+          senderAvatar: payload.sender.avatar,
+          text: payload.text,
+          createdAt: payload.createdAt,
+        },
+        ...filtered,
+      ];
     });
+  });
 
-    socketRef.current.on("connect", () => {
-      console.log("Socket connected");
-    });
-
-    socketRef.current.on("notification:new", (payload) => {
-      setNotifications((prev) => [payload, ...prev]);
-      setNotificationCount((prev) => prev + 1);
-    });
-
-    socketRef.current.on("new_message", (payload) => {
-      setUnreadCount((prev) => prev + 1);
-
-      setChatNotifications((prev) => {
-        const filtered = prev.filter(
-          (n) => n.conversationId !== payload.conversationId
-        );
-
-        return [
-          {
-            conversationId: payload.conversationId,
-            senderName: payload.sender.fullName,
-            senderAvatar: payload.sender.avatar,
-            text: payload.text,
-            createdAt: payload.createdAt,
-          },
-          ...filtered,
-        ];
-      });
-    });
-
-    return () => {
-      socketRef.current?.disconnect();
-    };
-  }, [isAuthenticated]);
+  return () => {
+    socketRef.current?.disconnect();
+  };
+}, [isAuthenticated]);
 
   useScrollReveal();
 
@@ -330,7 +334,7 @@ function App() {
       
       const { token, user } = loginResponse;
 
-      localStorage.setItem("token", token);
+      localStorage.setItem("userToken", token);
       localStorage.setItem("profile", JSON.stringify(user));
 
       setIsAuthenticated(true);
@@ -361,7 +365,7 @@ const handleRegister = async (userData) => {
     const { token, user } = response.data;
 
     // تخزين التوكن وبيانات المستخدم
-    localStorage.setItem("token", token);
+    localStorage.setItem("userToken", token);
     localStorage.setItem("profile", JSON.stringify(user));
 
     setIsAuthenticated(true);
@@ -416,7 +420,7 @@ const handleRegister = async (userData) => {
 };
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
+    localStorage.removeItem("userToken");
     localStorage.removeItem("profile"); // مسح التوكن والبيانات
     setIsAuthenticated(false);
     navigate("home");
@@ -444,7 +448,7 @@ const handleRegister = async (userData) => {
   }, []);
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
+    const token = localStorage.getItem("userToken");
     const profile = localStorage.getItem("profile");
     if (token && profile) {
       setIsAuthenticated(true);

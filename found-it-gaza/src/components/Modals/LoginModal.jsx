@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 
-const API_URL = "http://localhost:5000/api"; 
 const LoginModal = ({ open, onClose, onLogin, onRegister }) => {
   const [isSignUp, setIsSignUp] = useState(false);
   // ✅ إضافة المتغيرات لربط المدخلات
@@ -136,7 +135,7 @@ const LoginModal = ({ open, onClose, onLogin, onRegister }) => {
             <button 
               onClick={() => setIsSignUp(!isSignUp)}
               className="mr-2 text-blue-600 font-bold hover:underline"
-            >
+                >
               {isSignUp ? 'سجل دخولك' : 'أنشئ حساباً الآن'}
             </button>
           </div>

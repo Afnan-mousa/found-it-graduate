@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { getUserPosts, deleteItem } from "../services/api";
 import API from "../services/api";
+import { updateUserProfile } from "../services/api";
 
 function ProfilePage({ onManage, onDetails, refreshKey }) {
   const [userPosts, setUserPosts] = useState([]);
@@ -43,21 +44,34 @@ function ProfilePage({ onManage, onDetails, refreshKey }) {
 
 const handleSaveProfile = async () => {
   try {
-    const { data } = await API.put("/users/profile", {
-      fullName: name,
-      avatar,
-      location,
-    });
+    setIsSaving(true);
 
-    localStorage.setItem("profile", JSON.stringify(data.user));
-    setAvatar(data.user.avatar || "");
-    setName(data.user.fullName || "مستخدم");
-    setLocation(data.user.location || "غزة، فلسطين");
+    const payload = {
+      fullName: formData.fullName?.trim() || "",
+      avatar: formData.avatar?.trim() || "",
+      location: formData.location?.trim() || "",
+    };
 
-    alert("تم تحديث البروفايل");
-  } catch (err) {
-    console.error("Profile save error:", err);
-    alert(err?.response?.data?.message || "خطأ في الاتصال");
+    const { data } = await updateUserProfile(payload);
+
+    if (data?.success) {
+      const updatedUser = data.user;
+
+      setUserData(updatedUser);
+
+      localStorage.setItem("userName", updatedUser.fullName || "");
+      localStorage.setItem("userData", JSON.stringify(updatedUser));
+
+      alert("تم تحديث الملف الشخصي بنجاح");
+      setIsEditing(false);
+    } else {
+      throw new Error(data?.message || "فشل تحديث الملف الشخصي");
+    }
+  } catch (error) {
+    console.error("Profile save error:", error);
+    alert(error?.response?.data?.message || error.message || "فشل تحديث الملف الشخصي");
+  } finally {
+    setIsSaving(false);
   }
 };
 
@@ -91,6 +105,22 @@ const handleSaveProfile = async () => {
       alert(error?.response?.data?.message || "فشل حذف الإعلان");
     }
   };
+
+  useEffect(() => {
+  const savedUser = localStorage.getItem("userData");
+
+  if (savedUser) {
+    const parsedUser = JSON.parse(savedUser);
+    setUserData(parsedUser);
+    setFormData({
+      fullName: parsedUser.fullName || "",
+      email: parsedUser.email || "",
+      avatar: parsedUser.avatar || "",
+      location: parsedUser.location || "",
+      phone: parsedUser.phone || "",
+    });
+  }
+}, []);
 
   return (
     <section id="profile-page" className="page-section bg-gray-50 min-h-screen">

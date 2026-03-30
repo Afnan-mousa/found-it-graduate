@@ -15,8 +15,8 @@ const {
 router.post("/start", authMiddleware, startConversation);
 router.get("/", authMiddleware, getMyConversations);
 router.get("/unread-count", authMiddleware, getUnreadCount);
-router.get("/:id/messages", authMiddleware, getMessages);
 router.get("/notifications", authMiddleware, getChatNotifications);
+router.get("/:id/messages", authMiddleware, getMessages);
 router.post("/:id/messages", authMiddleware, sendMessage);
 router.put("/:id/read", authMiddleware, markMessagesAsRead);
 

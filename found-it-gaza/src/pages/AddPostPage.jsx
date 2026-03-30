@@ -35,51 +35,56 @@ const AddPostPage = ({ isAuthenticated, onRequireLogin, onPublished }) => {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    if (!isAuthenticated) {
-      onRequireLogin?.();
-      return;
-    }
+  if (!isAuthenticated) {
+    onRequireLogin?.();
+    return;
+  }
 
+  try {
     setIsSubmitting(true);
 
-    try {
-      const postData = {
-        title: form.title,
-        category: form.category,
-        description: form.description,
-        location: form.location,
-        date: form.date,
-        contactPhone: form.contactPhone,
-        type: postType,
-        image: imagePreview || "",
-      };
-      console.log("postData:", postData);
-      const response = await createPost(postData);
+    const payload = {
+      title: formData.title?.trim(),
+      description: formData.description?.trim(),
+      location: formData.location?.trim(),
+      locationDetails: formData.locationDetails?.trim() || "",
+      category: formData.category?.trim().toLowerCase(),
+      type: postType?.trim().toLowerCase(),
+      image: imagePreview || "",
+      date: formData.date,
+      contactPhone: formData.contactPhone?.trim(),
+    };
 
-      if (response.status === 201) {
-        alert("تمت الإضافة بنجاح");
-        onPublished?.(response.data.item);
+    const { data } = await createPost(payload);
 
-        setForm({
-          title: "",
-          category: "",
-          description: "",
-          location: "",
-          date: "",
-          contactPhone: "",
-        });
-        setImagePreview(null);
-        setPostType("lost");
-      }
-    }catch (error) {
-      console.error("خطأ أثناء النشر:", error.response?.data || error);
-      alert(error?.response?.data?.message || error.response?.data?.error || "حدث خطأ أثناء النشر");
-    } finally {
-      setIsSubmitting(false);
+    if (data?.success) {
+      alert("تمت إضافة الإعلان بنجاح");
+
+      setFormData({
+        title: "",
+        description: "",
+        location: "",
+        locationDetails: "",
+        category: "",
+        date: "",
+        contactPhone: "",
+      });
+
+      setImagePreview(null);
+      setPostType("lost");
+
+      onPublished?.(data.item);
+    } else {
+      throw new Error(data?.message || "فشل في إضافة الإعلان");
     }
-
+  } catch (error) {
+    console.error("Create post error:", error);
+    alert(error?.response?.data?.message || error.message || "فشل في إضافة الإعلان");
+  } finally {
+    setIsSubmitting(false);
+  }
 };
 
   return (
