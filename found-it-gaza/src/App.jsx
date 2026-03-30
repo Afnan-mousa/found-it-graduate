@@ -312,8 +312,8 @@ useEffect(() => {
     const loadNotifications = async () => {
     try {
       const [{ data: notifRes }, { data: countRes }] = await Promise.all([
-        api.getMyNotifications(),
-        api.getUnreadNotificationsCount(),
+        api.fetchNotifications(),
+        api.fetchUnreadNotificationsCount(),
       ]);
   
       setNotifications(notifRes.notifications || []);

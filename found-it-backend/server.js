@@ -32,7 +32,6 @@ const io = new Server(server, {
     credentials: true,
   },
 });
-const notificationRoutes = require("./routes/notificationRoutes");
 
 app.set("io", io);
 

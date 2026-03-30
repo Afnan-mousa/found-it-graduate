@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useRef } from "react";
 import {
-  fetchConversations,
+  fetchMyConversations,
   fetchMessages,
   sendMessage,
-  markConversationAsRead,
+  markMessagesAsRead,
 } from "../services/api";
 
 
@@ -25,7 +25,7 @@ const ChatPage = ({ recipient }) => {
   useEffect(() => {
     const loadConversations = async () => {
       try {
-        const { data } = await fetchConversations();
+        const { data } = await fetchMyConversations();
         setConversations(data.conversations || []);
 
         if (recipient) {
@@ -49,7 +49,7 @@ const ChatPage = ({ recipient }) => {
         const { data } = await fetchMessages(activeConversation);
         setMessages(data.messages || []);
 
-        await markConversationAsRead(activeConversation);
+        await markMessagesAsRead(activeConversation);
       } catch (err) {
         console.error("خطأ في جلب الرسائل:", err);
       }

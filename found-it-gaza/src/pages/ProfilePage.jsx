@@ -1,12 +1,11 @@
 import React, { useState, useEffect, useMemo } from "react";
-import { getUserPosts, deleteItem } from "../services/api";
-import API from "../services/api";
-import { updateUserProfile } from "../services/api";
+import { getUserPosts, deleteItem, updateUserProfile } from "../services/api";
 
 function ProfilePage({ onManage, onDetails, refreshKey }) {
   const [userPosts, setUserPosts] = useState([]);
   const [activeTab, setActiveTab] = useState("posts");
   const [loading, setLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
 
   const user = useMemo(() => {
     try {
@@ -46,30 +45,21 @@ const handleSaveProfile = async () => {
   try {
     setIsSaving(true);
 
-    const payload = {
-      fullName: formData.fullName?.trim() || "",
-      avatar: formData.avatar?.trim() || "",
-      location: formData.location?.trim() || "",
-    };
+    const { data } = await updateUserProfile({
+      fullName: name.trim(),
+      avatar,
+      location: location.trim(),
+    });
 
-    const { data } = await updateUserProfile(payload);
+    localStorage.setItem("profile", JSON.stringify(data.user));
+    setAvatar(data.user.avatar || "");
+    setName(data.user.fullName || "مستخدم");
+    setLocation(data.user.location || "غزة، فلسطين");
 
-    if (data?.success) {
-      const updatedUser = data.user;
-
-      setUserData(updatedUser);
-
-      localStorage.setItem("userName", updatedUser.fullName || "");
-      localStorage.setItem("userData", JSON.stringify(updatedUser));
-
-      alert("تم تحديث الملف الشخصي بنجاح");
-      setIsEditing(false);
-    } else {
-      throw new Error(data?.message || "فشل تحديث الملف الشخصي");
-    }
-  } catch (error) {
-    console.error("Profile save error:", error);
-    alert(error?.response?.data?.message || error.message || "فشل تحديث الملف الشخصي");
+    alert("تم تحديث البروفايل");
+  } catch (err) {
+    console.error("Profile save error:", err);
+    alert(err?.response?.data?.message || "فشل تحديث الملف الشخصي");
   } finally {
     setIsSaving(false);
   }
@@ -133,7 +123,7 @@ const handleSaveProfile = async () => {
           <div className="flex flex-col sm:flex-row items-center gap-4">
             <div className="relative">
               <img
-                src={avatar || "https://via.placeholder.com/150?text=User"}
+                src={avatar && avatar.trim() !== "" ? avatar : null}
                 alt="avatar"
                 className="w-24 h-24 rounded-full object-cover border-4 border-white shadow-md"
               />
@@ -327,11 +317,17 @@ const handleSaveProfile = async () => {
                       الصورة الشخصية
                     </label>
                     <div className="flex items-center gap-4">
-                      <img
-                        src={avatar || "https://via.placeholder.com/150?text=User"}
-                        className="w-16 h-16 rounded-full object-cover border"
-                        alt="avatar"
-                      />
+                      {avatar && avatar.trim() !== "" ? (
+                        <img
+                          src={avatar}
+                          className="w-16 h-16 rounded-full object-cover border"
+                          alt="avatar"
+                        />
+                      ) : (
+                        <div className="w-16 h-16 rounded-full border bg-gray-100 flex items-center justify-center text-gray-500 font-bold">
+                          U
+                        </div>
+                      )}
                       <input
                         type="file"
                         accept="image/*"
@@ -405,8 +401,9 @@ const handleSaveProfile = async () => {
                       className="py-2 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
                       type="button"
                       onClick={handleSaveProfile}
+                      disabled={isSaving}
                     >
-                      حفظ التعديلات
+                     {isSaving ? "جاري الحفظ..." : "حفظ التعديلات"}
                     </button>
                   </div>
                 </form>
