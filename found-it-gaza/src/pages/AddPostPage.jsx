@@ -46,15 +46,15 @@ const AddPostPage = ({ isAuthenticated, onRequireLogin, onPublished }) => {
     setIsSubmitting(true);
 
     const payload = {
-      title: formData.title?.trim(),
-      description: formData.description?.trim(),
-      location: formData.location?.trim(),
-      locationDetails: formData.locationDetails?.trim() || "",
-      category: formData.category?.trim().toLowerCase(),
+      title: form.title?.trim(),
+      description: form.description?.trim(),
+      location: form.location?.trim(),
+      locationDetails: form.locationDetails?.trim() || "",
+      category: form.category?.trim().toLowerCase(),
       type: postType?.trim().toLowerCase(),
       image: imagePreview || "",
-      date: formData.date,
-      contactPhone: formData.contactPhone?.trim(),
+      date: form.date,
+      contactPhone: form.contactPhone?.trim(),
     };
 
     const { data } = await createPost(payload);
