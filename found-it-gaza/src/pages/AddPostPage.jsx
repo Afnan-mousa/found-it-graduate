@@ -62,7 +62,7 @@ const AddPostPage = ({ isAuthenticated, onRequireLogin, onPublished }) => {
     if (data?.success) {
       alert("تمت إضافة الإعلان بنجاح");
 
-      setFormData({
+      setForm({
         title: "",
         description: "",
         location: "",
