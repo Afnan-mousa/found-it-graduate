@@ -4,7 +4,6 @@ const itemSchema = new mongoose.Schema({
     //المعلومات الاساسية 
     title: { type: String, required: true, trim: true, minlength: 5,}, 
     description: { type: String, required: true, trim: true, }, 
-
     type: { 
         type: String, 
         enum: ['lost', 'found'], 
@@ -12,7 +11,6 @@ const itemSchema = new mongoose.Schema({
         lowercase: true,
         trim: true,
     },
-
     // 3. الفئة (Category) - كما وردت في قائمة الاختيارات عندك
     category: { 
         type: String, 
@@ -29,7 +27,6 @@ const itemSchema = new mongoose.Schema({
         lowercase: true,
       trim: true,
     },
-
     // 4. التفاصيل اللوجستية
     location: { type: String, required: true,trim: true, }, // المكان
     locationDetails: {
@@ -37,8 +34,7 @@ const itemSchema = new mongoose.Schema({
       default: "",
       trim: true,
     },
-    date: { type: Date, required: true }, // التاريخ
-    
+    date: { type: Date, required: true }, // التاريخ   
     // 5. الوسائط والتواصل
     image: { type: String ,default: "",
       trim: true,}, // سنخزن رابط الصورة هنا

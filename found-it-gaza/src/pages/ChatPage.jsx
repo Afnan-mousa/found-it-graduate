@@ -6,7 +6,6 @@ import {
   markMessagesAsRead,
 } from "../services/api";
 
-
 const ChatPage = ({ recipient }) => {
   const [conversations, setConversations] = useState([]);
   const [activeConversation, setActiveConversation] = useState(null);
